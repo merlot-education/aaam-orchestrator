@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: aaam-orchestrator
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://sso.common.merlot-education.eu/realms/POC1
+          jwk-set-uri: ${spring.security.oauth2.resourceserver.jwt.issuer-uri}/protocol/openid-connect/certs
+
+jwt:
+  auth:
+    converter:
+      resource-id: MARKETPLACE
+      principal-attribute: preferred_username
+
+logging:
+  level:
+    org.springframework.security: DEBUG
+
+server:
+  port: '8081'
+  servlet:
+    context-path: /api
