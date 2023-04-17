@@ -14,8 +14,8 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class WebSecurityConfig {
 
-    public static final String ADMIN = "testrole";
-    public static final String USER = "testrole";
+    public static final String ADMIN = "OrgLegRep_1";
+    public static final String MISSING_ROLE = "missingrole";
     private final JwtAuthConverter jwtAuthConverter;
 
     @Bean
@@ -23,12 +23,13 @@ public class WebSecurityConfig {
         http.authorizeHttpRequests()
                 .requestMatchers(HttpMethod.GET, "/test/anonymous", "/test/anonymous/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/test/admin", "/test/admin/**").hasRole(ADMIN)
-                .requestMatchers(HttpMethod.GET, "/test/user").hasAnyRole(ADMIN, USER)
+                .requestMatchers(HttpMethod.GET, "/test/missingrole", "/test/missingrole/**").hasRole(MISSING_ROLE)
                 .anyRequest().authenticated();
         http.oauth2ResourceServer()
                 .jwt()
                 .jwtAuthenticationConverter(jwtAuthConverter);
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        http.cors();
         return http.build();
     }
 }

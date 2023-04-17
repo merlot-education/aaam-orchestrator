@@ -44,12 +44,11 @@ public class JwtAuthConverter implements Converter<Jwt, AbstractAuthenticationTo
     }
 
     private Collection<? extends GrantedAuthority> extractResourceRoles(Jwt jwt) {
-        Map<String, Object> resourceAccess = jwt.getClaim("resource_access");
+        Map<String, Object> resourceAccess = jwt.getClaim("realm_access");
         Map<String, Object> resource;
         Collection<String> resourceRoles;
         if (resourceAccess == null
-                || (resource = (Map<String, Object>) resourceAccess.get(properties.getResourceId())) == null
-                || (resourceRoles = (Collection<String>) resource.get("roles")) == null) {
+                || (resourceRoles = (Collection<String>) resourceAccess.get("roles")) == null) {
             return Set.of();
         }
         return resourceRoles.stream()
