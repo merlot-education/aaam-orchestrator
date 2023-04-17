@@ -1,6 +1,8 @@
 package eu.merloteducation.aaamorchestrator.controller;
 
-import org.springframework.http.ResponseEntity;
+import eu.merloteducation.aaamorchestrator.entities.Greeting;
+import eu.merloteducation.aaamorchestrator.service.KeycloakRestService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -8,9 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
-
-
-record Greeting(long id, String content) { }
 
 @RestController
 @CrossOrigin
@@ -21,6 +20,7 @@ public class TestController {
     public Greeting getAnonymous() {
         return new Greeting(10, "content");
     }
+
 
     @GetMapping("/admin")
     public Greeting getAdmin(Principal principal) {

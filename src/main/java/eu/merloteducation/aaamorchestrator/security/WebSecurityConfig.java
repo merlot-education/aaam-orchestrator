@@ -14,15 +14,16 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class WebSecurityConfig {
 
-    public static final String ADMIN = "OrgLegRep_1";
+    public static final String ADMIN = "OrgLegRep_1";  // TODO replace this with a general user role
     public static final String MISSING_ROLE = "missingrole";
     private final JwtAuthConverter jwtAuthConverter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests()
-                .requestMatchers(HttpMethod.GET, "/test/anonymous", "/test/anonymous/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/test/anonymous", "/test/anonymous/**", "/test/anonymous2", "/test/anonymous2/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/test/admin", "/test/admin/**").hasRole(ADMIN)
+                .requestMatchers(HttpMethod.GET, "/users", "/users/**").hasRole(ADMIN)
                 .requestMatchers(HttpMethod.GET, "/test/missingrole", "/test/missingrole/**").hasRole(MISSING_ROLE)
                 .anyRequest().authenticated();
         http.oauth2ResourceServer()
