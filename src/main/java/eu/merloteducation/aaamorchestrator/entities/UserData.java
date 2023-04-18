@@ -29,6 +29,8 @@ public class UserData {
     private List<String> disableableCredentialTypes;
     private List<String> requiredActions;
     private long notBefore;
+    @JsonView(Views.UserDataView.class)
+    private String orgaRole;
 
     public String getId() {
         return id;
@@ -132,5 +134,13 @@ public class UserData {
 
     public void setNotBefore(long notBefore) {
         this.notBefore = notBefore;
+    }
+
+    public String getOrgaRole() {
+        return orgaRole;
+    }
+
+    public void setOrgaRole(String orgaRole) {
+        this.orgaRole = orgaRole;
     }
 }

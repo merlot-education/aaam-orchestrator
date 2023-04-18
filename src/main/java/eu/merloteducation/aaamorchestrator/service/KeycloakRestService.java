@@ -87,16 +87,17 @@ public class KeycloakRestService {
         // ask the respective endpoints for the users enrolled in the specified organization ID
         ObjectMapper mapper = new ObjectMapper();
         List<UserData> userData = new ArrayList<>();
-        String[] endpoints = {"/OrgLegRep_", "/OrgRep_"};
+        String[] endpoints = {"OrgLegRep", "OrgRep"};
 
         for (String ep : endpoints) {
-            String ep_uri = keycloakAvailableRolesURI + ep + organizationId + "/users";
+            String ep_uri = keycloakAvailableRolesURI + "/" + ep + "_" + organizationId + "/users";
             try {
                 // get the users in this role, this will return a list of jsons
                 String response = restTemplate.exchange(ep_uri, HttpMethod.GET, request, String.class).getBody();
                 // take the response (if it failed we get into the catch) and map it to the entity class
                 List<UserData> ud = mapper.readValue(response,
                         mapper.getTypeFactory().constructCollectionType(List.class, UserData.class));
+                ud.forEach(u -> u.setOrgaRole(ep));
                 userData.addAll(ud);
             } catch (Exception e) {
                 System.out.println(ep_uri + " : " + e);
