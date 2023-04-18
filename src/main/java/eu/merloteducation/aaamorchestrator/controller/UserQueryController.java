@@ -1,15 +1,22 @@
 package eu.merloteducation.aaamorchestrator.controller;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import eu.merloteducation.aaamorchestrator.entities.UserData;
+import eu.merloteducation.aaamorchestrator.entities.Views;
 import eu.merloteducation.aaamorchestrator.service.KeycloakRestService;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.json.JsonParser;
 import org.springframework.boot.json.JsonParserFactory;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @CrossOrigin
@@ -19,33 +26,39 @@ public class UserQueryController {
     @Autowired
     private KeycloakRestService keycloakRestService;
 
-    @GetMapping("/getmgmttoken")
-    public String getAnonymous() {
-        try {
-            JsonParser parser = JsonParserFactory.getJsonParser();
-            // TODO remove the hardcoded user/pass once they are actually used
-            Map<String, Object> loginResult = parser.parseMap(keycloakRestService.login("usermgmt", "usermgmt"));
-            String token = (String) loginResult.get("access_token");
-            System.out.println(token);
-            return "token generated";
-        } catch (Exception e) {
-            System.out.println(e);
-            return "";
-        }
-    }
 
-    @GetMapping("/getFromMyOrga/{orgaId}")
-    public List<UserData> getAnonymous2(Principal principal, @PathVariable(value="orgaId") String orgaId) {
-        // TODO verify that the user requesting this is actually in this organization (via the roles of the token)
+    @GetMapping("/fromOrganization/{orgaId}")
+    @JsonView(Views.UserDataView.class)
+    public List<UserData> getFromOrganization(Principal principal,
+                                        @PathVariable(value="orgaId") String orgaId,
+                                        HttpServletResponse response) {
+        // get roles from the authenticated user
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Set<String> roles = authentication.getAuthorities()
+                .stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toSet());
+
+        // extract all orgaIds from the OrgRep and OrgLegRep Roles
+        Set<String> orgaIds = roles
+                .stream()
+                .filter(s -> s.startsWith("ROLE_OrgRep_") || s.startsWith("ROLE_OrgLegRep_"))
+                .map(s -> s.replace("ROLE_OrgRep_", "").replace("ROLE_OrgLegRep_", ""))
+                .collect(Collectors.toSet());
+
+        // if the requested organization id is not in the roles of this user,
+        // the user is not allowed to request the list of users
+        if (!orgaIds.contains(orgaId)) {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            return null;
+        }
+
+        // otherwise the user may request the user list of this organization
         try {
-            JsonParser parser = JsonParserFactory.getJsonParser();
-            // TODO remove the hardcoded user/pass once they are actually used
-            Map<String, Object> loginResult = parser.parseMap(keycloakRestService.login("usermgmt", "usermgmt"));
-            String token = (String) loginResult.get("access_token");
-            // TODO perhaps restrict the information about the users that is received here
-            return keycloakRestService.getUsersInOrganization(token, "1");
+            return keycloakRestService.getUsersInOrganization(orgaId);
         } catch (Exception e) {
             System.out.println(e);
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             return null;
         }
 
