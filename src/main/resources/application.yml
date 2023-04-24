@@ -5,7 +5,7 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://localhost:8080/realms/POC1
+          issuer-uri: https://sso.common.merlot-education.eu/realms/POC1
           jwk-set-uri: ${spring.security.oauth2.resourceserver.jwt.issuer-uri}/protocol/openid-connect/certs
 
 jwt:
@@ -19,6 +19,20 @@ logging:
     org.springframework.security: DEBUG
 
 server:
-  port: '8081'
+  port: '8083'
   servlet:
     context-path: /api
+
+keycloak:
+  client-id: "admin-cli"
+  authorization-grant-type: "password"
+  base-uri: "https://sso.common.merlot-education.eu"
+  oidc-base-uri: "${keycloak.base-uri}/realms/master/protocol/openid-connect"
+  admin-base-uri: "${keycloak.base-uri}/admin/realms/POC1"
+  authorization-uri: "${keycloak.oidc-base-uri}/auth"
+  available-roles-uri: "${keycloak.admin-base-uri}/roles"
+  token-uri: "${keycloak.oidc-base-uri}/token"
+  logout: "${keycloak.oidc-base-uri}/logout"
+  jwk-set-uri: "${keycloak.oidc-base-uri}/certs"
+  usermgmt-user: "usermgmt"
+  usermgmt-pass: "usermgmt"

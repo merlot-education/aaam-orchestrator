@@ -1,14 +1,11 @@
 package eu.merloteducation.aaamorchestrator.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import eu.merloteducation.aaamorchestrator.entities.UserData;
-import eu.merloteducation.aaamorchestrator.entities.Views;
+import eu.merloteducation.aaamorchestrator.models.UserData;
+import eu.merloteducation.aaamorchestrator.views.Views;
 import eu.merloteducation.aaamorchestrator.service.KeycloakRestService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.json.JsonParser;
-import org.springframework.boot.json.JsonParserFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;

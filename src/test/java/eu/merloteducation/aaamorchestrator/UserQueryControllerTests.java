@@ -1,7 +1,7 @@
 package eu.merloteducation.aaamorchestrator;
 
 import eu.merloteducation.aaamorchestrator.controller.UserQueryController;
-import eu.merloteducation.aaamorchestrator.entities.UserData;
+import eu.merloteducation.aaamorchestrator.models.UserData;
 import eu.merloteducation.aaamorchestrator.security.JwtAuthConverter;
 import eu.merloteducation.aaamorchestrator.service.KeycloakRestService;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,7 +12,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 
 import java.util.ArrayList;

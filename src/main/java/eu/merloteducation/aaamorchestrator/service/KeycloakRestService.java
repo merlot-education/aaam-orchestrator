@@ -1,7 +1,7 @@
 package eu.merloteducation.aaamorchestrator.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import eu.merloteducation.aaamorchestrator.entities.UserData;
+import eu.merloteducation.aaamorchestrator.models.UserData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.json.JsonParser;
