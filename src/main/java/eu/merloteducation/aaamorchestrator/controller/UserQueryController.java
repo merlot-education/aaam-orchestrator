@@ -17,11 +17,16 @@ import java.util.stream.Collectors;
 
 @RestController
 @CrossOrigin
-@RequestMapping("/users") // TODO map to root
+@RequestMapping("/")
 public class UserQueryController {
 
     @Autowired
     private KeycloakRestService keycloakRestService;
+
+    @GetMapping("health")
+    public void getHealth() {
+        // always return code 200
+    }
 
 
     @GetMapping("/fromOrganization/{orgaId}")
