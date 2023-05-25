@@ -25,6 +25,7 @@ public class UserQueryController {
 
     @GetMapping("health")
     public void getHealth() {
+        // always return code 200
     }
 
 
