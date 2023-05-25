@@ -50,7 +50,7 @@ public class UserQueryControllerTests {
     public void getUsersUnautenticated() throws Exception
     {
         mvc.perform(MockMvcRequestBuilders
-                        .get("/users/fromOrganization/1")
+                        .get("/fromOrganization/1")
                         .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isUnauthorized());
@@ -61,7 +61,7 @@ public class UserQueryControllerTests {
     {
 
         mvc.perform(MockMvcRequestBuilders
-                        .get("/users/fromOrganization/42")
+                        .get("/fromOrganization/42")
                         .with(user("user").password("user").roles("USER","ADMIN", "OrgLegRep_1"))
                         .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
@@ -72,7 +72,7 @@ public class UserQueryControllerTests {
     public void getUsersAuthenticatedAndAuthorized() throws Exception
     {
         mvc.perform(MockMvcRequestBuilders
-                        .get("/users/fromOrganization/1")
+                        .get("/fromOrganization/1")
                         .with(user("user").password("user").roles("USER","ADMIN", "OrgLegRep_1"))
                         .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
