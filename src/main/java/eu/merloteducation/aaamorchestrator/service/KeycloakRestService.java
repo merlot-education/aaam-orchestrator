@@ -58,7 +58,7 @@ public class KeycloakRestService {
         return loginResult;
     }
 
-    private void logoutUsermgmt(String refreshToken) throws Exception {
+    private void logoutUsermgmt(String refreshToken) {
         MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
         map.add("client_id", clientId);
         map.add("refresh_token", refreshToken);
@@ -67,15 +67,12 @@ public class KeycloakRestService {
         String result = restTemplate.postForObject(keycloakLogout, request, String.class);
     }
 
-    public String getAvailableRoles(String token) throws Exception {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.add("Authorization", token);
-        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(null, headers);
-        return restTemplate.exchange(keycloakAvailableRolesURI, HttpMethod.GET, request, String.class).getBody();
-    }
-
-    public List<UserData> getUsersInOrganization(String organizationId) throws Exception {
+    /**
+     * For a given organization id, request all enrolled users from the authentication backend.
+     * @param organizationId id to request user list for
+     * @return list of users in organization
+     */
+    public List<UserData> getUsersInOrganization(String organizationId) {
 
         // prepare OAuth2 session as usermgmt account for reading users in keycloak
         // note this is separate from the token that was provided by the user asking for this execution

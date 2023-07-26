@@ -23,17 +23,26 @@ public class UserQueryController {
     @Autowired
     private KeycloakRestService keycloakRestService;
 
+    /**
+     * GET request, Always returns 200, used for health checks.
+     */
     @GetMapping("health")
     public void getHealth() {
         // always return code 200
     }
 
 
+    /**
+     * GET request, for a given organization fetch the enrolled users if allowed to do so.
+     *
+     * @param orgaId   id of organization to request the users from
+     * @param response object for http code response
+     * @return List of user details of this organization
+     */
     @GetMapping("/fromOrganization/{orgaId}")
     @JsonView(Views.UserDataView.class)
-    public List<UserData> getFromOrganization(Principal principal,
-                                        @PathVariable(value="orgaId") String orgaId,
-                                        HttpServletResponse response) {
+    public List<UserData> getFromOrganization(@PathVariable(value = "orgaId") String orgaId,
+                                              HttpServletResponse response) {
         // get roles from the authenticated user
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Set<String> roles = authentication.getAuthorities()
