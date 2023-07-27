@@ -29,15 +29,6 @@ public class UserQueryController {
     private KeycloakRestService keycloakRestService;
 
     /**
-     * GET request, Always returns 200, used for health checks.
-     */
-    @GetMapping("health")
-    public void getHealth() {
-        // always return code 200
-    }
-
-
-    /**
      * GET request, for a given organization fetch the enrolled users if allowed to do so.
      *
      * @param orgaId id of organization to request the users from
