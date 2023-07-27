@@ -33,7 +33,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 @EnableConfigurationProperties
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class KeycloakRestServiceTests {
+class KeycloakRestServiceTests {
 
     @Mock
     private RestTemplate restTemplate;
@@ -50,7 +50,7 @@ public class KeycloakRestServiceTests {
     private KeycloakRestService keycloakRestService;
 
     @BeforeAll
-    public void beforeAll() {
+    void beforeAll() {
         ReflectionTestUtils.setField(keycloakRestService, "keycloakTokenUri", keycloakTokenUri);
         ReflectionTestUtils.setField(keycloakRestService, "keycloakLogout", keycloakLogout);
         ReflectionTestUtils.setField(keycloakRestService, "keycloakAvailableRolesURI", keycloakAvailableRolesURI);

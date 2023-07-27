@@ -26,7 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(UserQueryController.class)
-public class UserQueryControllerTests {
+class UserQueryControllerTests {
 
     @Autowired
     private MockMvc mvc;
@@ -38,7 +38,7 @@ public class UserQueryControllerTests {
     private JwtAuthConverter jwtAuthConverter;
 
     @BeforeEach
-    public void setUp() throws Exception {
+    void setUp() throws Exception {
         List<UserData> udl = new ArrayList<>();
         UserData ud = new UserData();
         ud.setUsername("user");
@@ -47,7 +47,7 @@ public class UserQueryControllerTests {
     }
 
     @Test
-    public void getUsersUnautenticated() throws Exception
+    void getUsersUnautenticated() throws Exception
     {
         mvc.perform(MockMvcRequestBuilders
                         .get("/fromOrganization/1")
@@ -57,7 +57,7 @@ public class UserQueryControllerTests {
     }
 
     @Test
-    public void getUsersAuthenticatedButUnauthorized() throws Exception
+    void getUsersAuthenticatedButUnauthorized() throws Exception
     {
 
         mvc.perform(MockMvcRequestBuilders
@@ -69,7 +69,7 @@ public class UserQueryControllerTests {
     }
 
     @Test
-    public void getUsersAuthenticatedAndAuthorized() throws Exception
+    void getUsersAuthenticatedAndAuthorized() throws Exception
     {
         mvc.perform(MockMvcRequestBuilders
                         .get("/fromOrganization/1")
