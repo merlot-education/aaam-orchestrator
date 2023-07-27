@@ -1,7 +1,6 @@
 package eu.merloteducation.aaamorchestrator.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.merloteducation.aaamorchestrator.models.UserData;
 import org.slf4j.Logger;
@@ -18,7 +17,6 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
-import javax.security.auth.login.LoginException;
 import java.util.*;
 
 @Service

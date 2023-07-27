@@ -5,7 +5,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import eu.merloteducation.aaamorchestrator.models.UserData;
 import eu.merloteducation.aaamorchestrator.views.Views;
 import eu.merloteducation.aaamorchestrator.service.KeycloakRestService;
-import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.security.Principal;
 import java.util.*;
 import java.util.stream.Collectors;
 
