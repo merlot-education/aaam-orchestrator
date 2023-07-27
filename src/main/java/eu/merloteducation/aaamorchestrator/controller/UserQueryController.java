@@ -21,7 +21,11 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
-@CrossOrigin
+@CrossOrigin(originPatterns = {
+        "http://localhost:[*]",
+        "https://marketplace.dev.merlot-education.eu",
+        "https://marketplace.demo.merlot-education.eu"
+})
 @RequestMapping("/")
 public class UserQueryController {
 
