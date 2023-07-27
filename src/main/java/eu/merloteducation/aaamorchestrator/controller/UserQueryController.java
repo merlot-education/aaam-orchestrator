@@ -23,8 +23,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
-@CrossOrigin(originPatterns = {
-        "http://localhost:[*]",
+@CrossOrigin({
+        "http://localhost:4200",
         "https://marketplace.dev.merlot-education.eu",
         "https://marketplace.demo.merlot-education.eu"
 })
