@@ -25,6 +25,15 @@ server:
   error:
     include-stacktrace: "never"
 
+management:
+  endpoints:
+    enabled-by-default: false
+    web:
+      base-path: "/"
+  endpoint:
+    health:
+      enabled: true
+
 keycloak:
   client-id: "admin-cli"
   authorization-grant-type: "password"

@@ -2,12 +2,14 @@ package eu.merloteducation.aaamorchestrator;
 
 import eu.merloteducation.aaamorchestrator.models.UserData;
 import eu.merloteducation.aaamorchestrator.service.KeycloakRestService;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -23,13 +25,15 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.isA;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @ExtendWith(MockitoExtension.class)
 @EnableConfigurationProperties
-public class KeycloakRestServiceTests {
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class KeycloakRestServiceTests {
 
     @Mock
     private RestTemplate restTemplate;
@@ -42,14 +46,15 @@ public class KeycloakRestServiceTests {
 
     @Value("${keycloak.available-roles-uri}")
     private String keycloakAvailableRolesURI;
-    @InjectMocks
+    @Autowired
     private KeycloakRestService keycloakRestService;
 
-    @BeforeEach
-    public void setUp() {
+    @BeforeAll
+    void beforeAll() {
         ReflectionTestUtils.setField(keycloakRestService, "keycloakTokenUri", keycloakTokenUri);
         ReflectionTestUtils.setField(keycloakRestService, "keycloakLogout", keycloakLogout);
         ReflectionTestUtils.setField(keycloakRestService, "keycloakAvailableRolesURI", keycloakAvailableRolesURI);
+        ReflectionTestUtils.setField(keycloakRestService, "restTemplate", restTemplate);
         when(restTemplate.postForObject(eq(keycloakTokenUri), any(), eq(String.class)))
                 .thenReturn("{\"access_token\": \"1234\", \"refresh_token\": \"5678\"}");
 
@@ -84,17 +89,37 @@ public class KeycloakRestServiceTests {
     }
 
     @Test
-    public void givenOrgaIdReturnUsers() throws Exception{
+    void givenOrgaIdReturnUsersValid() throws Exception{
 
         // at endpoint 1 expect to get a list of UserData with a single user
         List<UserData> udl = keycloakRestService.getUsersInOrganization("1");
         assertThat(udl, isA(List.class));
-        assertThat(udl, not(empty()));
+        assertFalse(udl.isEmpty());
+        assertEquals(1, udl.size());
+        UserData entry = udl.get(0);
+        assertEquals("1234", entry.getId());
+        assertEquals(1234L, entry.getCreatedTimestamp());
+        assertEquals("user", entry.getUsername());
+        assertTrue(entry.isEnabled());
+        assertTrue(entry.isTotp());
+        assertTrue(entry.isEmailVerified());
+        assertEquals("John", entry.getFirstName());
+        assertEquals("Doe", entry.getLastName());
+        assertEquals("user@user.user", entry.getEmail());
+        assertNull(entry.getAttributes());
+        assertTrue(entry.getDisableableCredentialTypes().isEmpty());
+        assertTrue(entry.getRequiredActions().isEmpty());
+        assertEquals(1234L, entry.getNotBefore());
+
+    }
+
+    @Test
+    void givenOrgaIdReturnUsersNonExistent() throws Exception{
 
         // at endpoint 42 expect to get no users
-        udl = keycloakRestService.getUsersInOrganization("42");
+        List<UserData> udl = keycloakRestService.getUsersInOrganization("42");
         assertThat(udl, isA(List.class));
-        assertThat(udl, empty());
+        assertTrue(udl.isEmpty());
 
     }
 

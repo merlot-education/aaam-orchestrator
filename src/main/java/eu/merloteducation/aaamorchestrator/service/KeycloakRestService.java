@@ -1,18 +1,20 @@
 package eu.merloteducation.aaamorchestrator.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.merloteducation.aaamorchestrator.models.UserData;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.json.JsonParseException;
 import org.springframework.boot.json.JsonParser;
 import org.springframework.boot.json.JsonParserFactory;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
@@ -22,6 +24,8 @@ public class KeycloakRestService {
 
     @Autowired
     private RestTemplate restTemplate;
+
+    private final Logger logger = LoggerFactory.getLogger(KeycloakRestService.class);
 
     @Value("${keycloak.token-uri}")
     private String keycloakTokenUri;
@@ -46,40 +50,40 @@ public class KeycloakRestService {
 
     private Map<String, Object> loginUsermgmt() {
         MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
-        map.add("username",keycloakUsermgmtUser);
-        map.add("password",keycloakUsermgmtPass);
-        map.add("client_id",clientId);
-        map.add("grant_type",grantType);
+        map.add("username", keycloakUsermgmtUser);
+        map.add("password", keycloakUsermgmtPass);
+        map.add("client_id", clientId);
+        map.add("grant_type", grantType);
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, new HttpHeaders());
         String response = restTemplate.postForObject(keycloakTokenUri, request, String.class);
 
         JsonParser parser = JsonParserFactory.getJsonParser();
-        Map<String, Object> loginResult = parser.parseMap(response);
-        return loginResult;
+        return parser.parseMap(response);
     }
 
-    private void logoutUsermgmt(String refreshToken) throws Exception {
+    private void logoutUsermgmt(String refreshToken) {
         MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
         map.add("client_id", clientId);
         map.add("refresh_token", refreshToken);
 
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, null);
-        String result = restTemplate.postForObject(keycloakLogout, request, String.class);
+        restTemplate.postForObject(keycloakLogout, request, String.class);
     }
 
-    public String getAvailableRoles(String token) throws Exception {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.add("Authorization", token);
-        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(null, headers);
-        return restTemplate.exchange(keycloakAvailableRolesURI, HttpMethod.GET, request, String.class).getBody();
-    }
-
-    public List<UserData> getUsersInOrganization(String organizationId) throws Exception {
+    /**
+     * For a given organization id, request all enrolled users from the authentication backend.
+     *
+     * @param organizationId id to request user list for
+     * @return list of users in organization
+     */
+    public List<UserData> getUsersInOrganization(String organizationId) throws RestClientResponseException,
+            JsonProcessingException, JsonParseException {
 
         // prepare OAuth2 session as usermgmt account for reading users in keycloak
         // note this is separate from the token that was provided by the user asking for this execution
-        Map<String, Object> usermgmtLoginResponse = loginUsermgmt();
+        Map<String, Object> usermgmtLoginResponse;
+        usermgmtLoginResponse = loginUsermgmt();
+
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Bearer " + usermgmtLoginResponse.get("access_token"));
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(null, headers);
@@ -90,17 +94,21 @@ public class KeycloakRestService {
         String[] endpoints = {"OrgLegRep", "OrgRep"};
 
         for (String ep : endpoints) {
-            String ep_uri = keycloakAvailableRolesURI + "/" + ep + "_" + organizationId + "/users";
+            String epUri = keycloakAvailableRolesURI + "/" + ep + "_" + organizationId + "/users";
             try {
                 // get the users in this role, this will return a list of jsons
-                String response = restTemplate.exchange(ep_uri, HttpMethod.GET, request, String.class).getBody();
+                String response = restTemplate.exchange(epUri, HttpMethod.GET, request, String.class).getBody();
                 // take the response (if it failed we get into the catch) and map it to the entity class
                 List<UserData> ud = mapper.readValue(response,
                         mapper.getTypeFactory().constructCollectionType(List.class, UserData.class));
                 ud.forEach(u -> u.setOrgaRole(ep));
                 userData.addAll(ud);
-            } catch (Exception e) {
-                System.out.println(ep_uri + " : " + e);
+            } catch (RestClientResponseException e) {
+                if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
+                    logger.info("No data at endpoint: {}", epUri);
+                } else {
+                    throw e;
+                }
             }
         }
 
