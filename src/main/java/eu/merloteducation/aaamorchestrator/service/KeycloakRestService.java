@@ -107,7 +107,7 @@ public class KeycloakRestService {
                 userData.addAll(ud);
             } catch (RestClientResponseException e) {
                 if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
-                    logger.info("No data at endpoint: " + ep_uri);
+                    logger.info("No data at endpoint: {}", ep_uri);
                 } else {
                     throw e;
                 }
