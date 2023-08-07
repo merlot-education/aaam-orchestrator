@@ -1,4 +1,6 @@
 spring:
+  profiles:
+    active: default
   application:
     name: aaam-orchestrator
   security:
@@ -47,3 +49,10 @@ keycloak:
   jwk-set-uri: "${keycloak.oidc-base-uri}/certs"
   usermgmt-user: "usermgmt"
   usermgmt-pass: "usermgmt"
+
+cors:
+  global:
+    origins: >
+      http://localhost:4200,
+      https://marketplace.dev.merlot-education.eu,
+      https://marketplace.demo.merlot-education.eu
