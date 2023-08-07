@@ -53,6 +53,4 @@ keycloak:
 cors:
   global:
     origins: >
-      http://localhost:4200,
-      https://marketplace.dev.merlot-education.eu,
-      https://marketplace.demo.merlot-education.eu
+      http://localhost:4200
