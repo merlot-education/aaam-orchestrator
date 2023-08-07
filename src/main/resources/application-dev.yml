@@ -2,3 +2,4 @@ cors:
   global:
     origins: >
       https://marketplace.dev.merlot-education.eu
+    patterns:

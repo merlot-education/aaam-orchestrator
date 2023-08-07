@@ -54,3 +54,4 @@ cors:
   global:
     origins: >
       http://localhost:4200
+    patterns:

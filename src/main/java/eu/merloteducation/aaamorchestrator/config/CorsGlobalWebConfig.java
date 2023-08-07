@@ -13,10 +13,13 @@ import java.util.Arrays;
 public class CorsGlobalWebConfig implements WebMvcConfigurer {
     @Value("${cors.global.origins}")
     private String[] corsGlobalOrigins;
+    @Value("${cors.global.patterns}")
+    private String[] corsGlobalPatterns;
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins(corsGlobalOrigins);
+                .allowedOrigins(corsGlobalOrigins)
+                .allowedOriginPatterns(corsGlobalPatterns);
     }
 }
