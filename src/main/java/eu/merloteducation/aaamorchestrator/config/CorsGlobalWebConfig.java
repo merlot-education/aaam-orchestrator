@@ -1,6 +1,5 @@
 package eu.merloteducation.aaamorchestrator.config;
 
-import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
@@ -14,7 +13,7 @@ public class CorsGlobalWebConfig implements WebMvcConfigurer {
     private String[] corsGlobalOrigins;
 
     @Override
-    public void addCorsMappings(@NotNull CorsRegistry registry) {
+    public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
                 .allowedOrigins(corsGlobalOrigins);
     }
