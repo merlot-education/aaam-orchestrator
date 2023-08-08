@@ -9,7 +9,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import java.util.Arrays;
 
 @Configuration
-@EnableWebMvc
 public class CorsGlobalWebConfig implements WebMvcConfigurer {
     @Value("${cors.global.origins}")
     private String[] corsGlobalOrigins;
