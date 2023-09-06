@@ -63,6 +63,10 @@ class KeycloakRestServiceTests {
         when(restTemplate.exchange(startsWith(keycloakAvailableRolesURI), eq(HttpMethod.GET), any(), eq(String.class)))
                 .thenThrow(new RestClientResponseException("not found", HttpStatus.NOT_FOUND, "not found", null, null, null));
 
+        // simulate bad connection
+        when(restTemplate.exchange(eq(keycloakAvailableRolesURI + "/OrgLegRep_99/users"), eq(HttpMethod.GET), any(), eq(String.class)))
+                .thenThrow(new RestClientResponseException("not found", HttpStatus.INTERNAL_SERVER_ERROR, "not found", null, null, null));
+
         String mockUserResponse = """
         [{
             "id": "1234",
@@ -88,7 +92,6 @@ class KeycloakRestServiceTests {
 
     @Test
     void givenOrgaIdReturnUsersValid() throws Exception{
-
         // at endpoint 1 expect to get a list of UserData with a single user
         List<UserData> udl = keycloakRestService.getUsersInOrganization("1");
         assertThat(udl, isA(List.class));
@@ -113,11 +116,17 @@ class KeycloakRestServiceTests {
 
     @Test
     void givenOrgaIdReturnUsersNonExistent() throws Exception{
-
         // at endpoint 42 expect to get no users
         List<UserData> udl = keycloakRestService.getUsersInOrganization("42");
         assertThat(udl, isA(List.class));
         assertTrue(udl.isEmpty());
+
+    }
+
+    @Test
+    void givenOrgaIdReturnUsersBadConnection() {
+        // at endpoint 99 expect bad connection
+        assertThrows(RestClientResponseException.class, () -> keycloakRestService.getUsersInOrganization("99"));
 
     }
 
