@@ -2,7 +2,6 @@ package eu.merloteducation.aaamorchestrator;
 
 import eu.merloteducation.aaamorchestrator.models.UserData;
 import eu.merloteducation.aaamorchestrator.service.KeycloakRestService;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -17,13 +16,12 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.isA;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -63,7 +61,7 @@ class KeycloakRestServiceTests {
 
         // in general return empty list of users for any unspecified role endpoint
         when(restTemplate.exchange(startsWith(keycloakAvailableRolesURI), eq(HttpMethod.GET), any(), eq(String.class)))
-                .thenReturn(new ResponseEntity<>("[]", HttpStatus.OK));
+                .thenThrow(new RestClientResponseException("not found", HttpStatus.NOT_FOUND, "not found", null, null, null));
 
         String mockUserResponse = """
         [{
