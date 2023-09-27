@@ -1,5 +1,4 @@
-package eu.merloteducation.aaamorchestrator.security;
-
+package eu.merloteducation.aaamorchestrator.auth;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;

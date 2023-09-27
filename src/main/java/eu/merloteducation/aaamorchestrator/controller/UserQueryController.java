@@ -10,15 +10,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.json.JsonParseException;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/")
@@ -37,28 +34,9 @@ public class UserQueryController {
      */
     @GetMapping("/fromOrganization/{orgaId}")
     @JsonView(Views.UserDataView.class)
+    @PreAuthorize("@authorityChecker.representsOrganization(authentication, #orgaId)")
     public List<UserData> getFromOrganization(@PathVariable(value = "orgaId") String orgaId) {
-        // get roles from the authenticated user
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Set<String> roles = authentication.getAuthorities()
-                .stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.toSet());
-
-        // extract all orgaIds from the OrgRep and OrgLegRep Roles
-        Set<String> orgaIds = roles
-                .stream()
-                .filter(s -> s.startsWith("ROLE_OrgRep_") || s.startsWith("ROLE_OrgLegRep_"))
-                .map(s -> s.replace("ROLE_OrgRep_", "").replace("ROLE_OrgLegRep_", ""))
-                .collect(Collectors.toSet());
-
-        // if the requested organization id is not in the roles of this user,
-        // the user is not allowed to request the list of users
-        if (!orgaIds.contains(orgaId)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Not authorized to request users for this organization.");
-        }
-
-        // otherwise the user may request the user list of this organization
+        // the user may request the user list of this organization
         try {
             return keycloakRestService.getUsersInOrganization(orgaId);
         } catch (JsonProcessingException | JsonParseException | RestClientResponseException e) {
