@@ -101,7 +101,7 @@ public class KeycloakRestService {
                 // take the response (if it failed we get into the catch) and map it to the entity class
                 List<UserData> ud = mapper.readValue(response,
                         mapper.getTypeFactory().constructCollectionType(List.class, UserData.class));
-                ud.forEach(u -> u.setOrgaRole(ep));
+                ud.stream().filter(UserData::isEnabled).forEach(u -> u.setOrgaRole(ep));
                 userData.addAll(ud);
             } catch (RestClientResponseException e) {
                 if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
