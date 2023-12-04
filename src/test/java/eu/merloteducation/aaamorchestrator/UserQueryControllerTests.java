@@ -4,10 +4,8 @@ import eu.merloteducation.aaamorchestrator.controller.UserQueryController;
 import eu.merloteducation.aaamorchestrator.models.UserData;
 import eu.merloteducation.aaamorchestrator.security.WebSecurityConfig;
 import eu.merloteducation.aaamorchestrator.service.KeycloakRestService;
-import eu.merloteducation.authorizationlibrary.authorization.AuthorityChecker;
-import eu.merloteducation.authorizationlibrary.authorization.JwtAuthConverter;
-import eu.merloteducation.authorizationlibrary.authorization.JwtAuthConverterProperties;
-import eu.merloteducation.authorizationlibrary.authorization.OrganizationRoleGrantedAuthority;
+import eu.merloteducation.authorizationlibrary.authorization.*;
+import eu.merloteducation.authorizationlibrary.config.InterceptorConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,13 +26,12 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest({UserQueryController.class, WebSecurityConfig.class})
-@Import({ AuthorityChecker.class, JwtAuthConverter.class })
+@Import({ AuthorityChecker.class, ActiveRoleHeaderHandlerInterceptor.class, JwtAuthConverter.class, InterceptorConfig.class})
 class UserQueryControllerTests {
 
     @Autowired
