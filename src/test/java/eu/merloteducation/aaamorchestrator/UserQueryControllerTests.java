@@ -1,18 +1,17 @@
 package eu.merloteducation.aaamorchestrator;
 
-import eu.merloteducation.aaamorchestrator.auth.AuthorityChecker;
-import eu.merloteducation.aaamorchestrator.auth.JwtAuthConverter;
-import eu.merloteducation.aaamorchestrator.auth.JwtAuthConverterProperties;
-import eu.merloteducation.aaamorchestrator.auth.OrganizationRoleGrantedAuthority;
 import eu.merloteducation.aaamorchestrator.controller.UserQueryController;
 import eu.merloteducation.aaamorchestrator.models.UserData;
 import eu.merloteducation.aaamorchestrator.security.WebSecurityConfig;
 import eu.merloteducation.aaamorchestrator.service.KeycloakRestService;
+import eu.merloteducation.authorizationlibrary.authorization.*;
+import eu.merloteducation.authorizationlibrary.config.InterceptorConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.web.servlet.MockMvc;
@@ -27,12 +26,12 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest({UserQueryController.class, WebSecurityConfig.class, AuthorityChecker.class})
+@WebMvcTest({UserQueryController.class, WebSecurityConfig.class})
+@Import({ AuthorityChecker.class, ActiveRoleHeaderHandlerInterceptor.class, JwtAuthConverter.class, InterceptorConfig.class})
 class UserQueryControllerTests {
 
     @Autowired
