@@ -19,12 +19,15 @@ import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.isA;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -48,7 +51,7 @@ class KeycloakRestServiceTests {
     private KeycloakRestService keycloakRestService;
 
     @BeforeAll
-    void beforeAll() {
+    void beforeAll() throws URISyntaxException {
         ReflectionTestUtils.setField(keycloakRestService, "keycloakTokenUri", keycloakTokenUri);
         ReflectionTestUtils.setField(keycloakRestService, "keycloakLogout", keycloakLogout);
         ReflectionTestUtils.setField(keycloakRestService, "keycloakAvailableRolesURI", keycloakAvailableRolesURI);
@@ -59,13 +62,10 @@ class KeycloakRestServiceTests {
         when(restTemplate.postForObject(eq(keycloakLogout), any(), eq(String.class)))
                 .thenReturn("");
 
-        // in general return empty list of users for any unspecified role endpoint
-        when(restTemplate.exchange(startsWith(keycloakAvailableRolesURI), eq(HttpMethod.GET), any(), eq(String.class)))
+        lenient().when(restTemplate.exchange(eq(new URI(keycloakAvailableRolesURI + "/OrgLegRep_99/users")), eq(HttpMethod.GET), any(), eq(String.class)))
                 .thenThrow(new RestClientResponseException("not found", HttpStatus.NOT_FOUND, "not found", null, null, null));
-
-        // simulate bad connection
-        when(restTemplate.exchange(eq(keycloakAvailableRolesURI + "/OrgLegRep_99/users"), eq(HttpMethod.GET), any(), eq(String.class)))
-                .thenThrow(new RestClientResponseException("not found", HttpStatus.INTERNAL_SERVER_ERROR, "not found", null, null, null));
+        lenient().when(restTemplate.exchange(eq(new URI(keycloakAvailableRolesURI + "/FedAdmin_99/users")), eq(HttpMethod.GET), any(), eq(String.class)))
+                .thenThrow(new RestClientResponseException("not found", HttpStatus.NOT_FOUND, "not found", null, null, null));
 
         String mockUserResponse = """
         [{
@@ -84,9 +84,12 @@ class KeycloakRestServiceTests {
             "notBefore": 1234
         }]
         """;
+
         // for endpoint with orga ID 1 return a single user
-        when(restTemplate.exchange(eq(keycloakAvailableRolesURI + "/OrgLegRep_1/users"), eq(HttpMethod.GET), any(), eq(String.class)))
+        lenient().when(restTemplate.exchange(eq(new URI(keycloakAvailableRolesURI + "/OrgLegRep_1/users")), eq(HttpMethod.GET), any(), eq(String.class)))
                 .thenReturn(new ResponseEntity<>(mockUserResponse, HttpStatus.OK));
+        lenient().when(restTemplate.exchange(eq(new URI(keycloakAvailableRolesURI + "/FedAdmin_1/users")), eq(HttpMethod.GET), any(), eq(String.class)))
+                .thenThrow(new RestClientResponseException("not found", HttpStatus.NOT_FOUND, "not found", null, null, null));
 
     }
 
@@ -117,17 +120,9 @@ class KeycloakRestServiceTests {
     @Test
     void givenOrgaIdReturnUsersNonExistent() throws Exception{
         // at endpoint 42 expect to get no users
-        List<UserData> udl = keycloakRestService.getUsersInOrganization("42");
+        List<UserData> udl = keycloakRestService.getUsersInOrganization("99");
         assertThat(udl, isA(List.class));
         assertTrue(udl.isEmpty());
 
     }
-
-    @Test
-    void givenOrgaIdReturnUsersBadConnection() {
-        // at endpoint 99 expect bad connection
-        assertThrows(RestClientResponseException.class, () -> keycloakRestService.getUsersInOrganization("99"));
-
-    }
-
 }

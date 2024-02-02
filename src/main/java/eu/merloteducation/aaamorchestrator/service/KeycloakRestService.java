@@ -17,6 +17,8 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.*;
 
 @Service
@@ -91,11 +93,12 @@ public class KeycloakRestService {
         // ask the respective endpoints for the users enrolled in the specified organization ID
         ObjectMapper mapper = new ObjectMapper();
         List<UserData> userData = new ArrayList<>();
-        String[] endpoints = {"OrgLegRep", "OrgRep"};
+        String[] endpoints = {"OrgLegRep", "FedAdmin"};
 
         for (String ep : endpoints) {
-            String epUri = keycloakAvailableRolesURI + "/" + ep + "_" + organizationId + "/users";
+            String epStr = keycloakAvailableRolesURI + "/" + ep + "_" + organizationId + "/users";
             try {
+                URI epUri = new URI(epStr.replace("#", "%23"));
                 // get the users in this role, this will return a list of jsons
                 String response = restTemplate.exchange(epUri, HttpMethod.GET, request, String.class).getBody();
                 // take the response (if it failed we get into the catch) and map it to the entity class
@@ -106,10 +109,12 @@ public class KeycloakRestService {
                 userData.addAll(ud);
             } catch (RestClientResponseException e) {
                 if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
-                    logger.info("No data at endpoint: {}", epUri);
+                    logger.info("No data at endpoint: {}", epStr);
                 } else {
                     throw e;
                 }
+            } catch (URISyntaxException e) {
+                logger.info("Failed to build URI. {}", e.getMessage());
             }
         }
 
