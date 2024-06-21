@@ -1,8 +1,16 @@
 # MERLOT AAAM Orchestrator
-The Authentication-Authorization-Account-Manager (AAAM) Orchestrator is a microservice in the MERLOT marketplace
-which handles fetching account information from the authentication backend (e.g. Keycloak).
 
-This currently includes information such as the enrolled users in a particular organisation.
+**NOTE** Currently this orchestrator serves no purpose in the MERLOT MPO as previously it was only used to fetch users from keycloak from the same organization for displaying in the frontend.
+With the introduction of SSI this feature can no longer exist as the issuer agent is decentralized and (typically) not publicly available to fetch issued credentials (i.e. users) from.
+The AAAM functionality of the marketplace is performed by the following services regardless without this microservice:
+- Keycloak (Machine to Machine authentication for XFSC Federated Catalogue)
+- SSI (AAS, OCM, PCM for user authentication)
+- DAPS (Machine to Machine authentication for EDC Connectors)
+
+The Authentication-Authorization-Account-Manager (AAAM) Orchestrator **used to be** a microservice in the MERLOT marketplace
+which handled fetching account information from the authentication backend (e.g. Keycloak).
+
+This included information such as the enrolled users in a particular organisation.
 
 ## Development
 
