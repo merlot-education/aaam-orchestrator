@@ -21,8 +21,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import eu.merloteducation.aaamorchestrator.models.UserData;
 import eu.merloteducation.aaamorchestrator.views.Views;
 import eu.merloteducation.aaamorchestrator.service.KeycloakRestService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.json.JsonParseException;
 import org.springframework.http.HttpStatus;
@@ -35,12 +34,13 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/")
+@Slf4j
 public class UserQueryController {
+    private final KeycloakRestService keycloakRestService;
 
-    @Autowired
-    private KeycloakRestService keycloakRestService;
-
-    private final Logger logger = LoggerFactory.getLogger(UserQueryController.class);
+    public UserQueryController(@Autowired KeycloakRestService keycloakRestService) {
+        this.keycloakRestService = keycloakRestService;
+    }
 
     /**
      * GET request, for a given organization fetch the enrolled users if allowed to do so.
@@ -56,7 +56,7 @@ public class UserQueryController {
         try {
             return keycloakRestService.getUsersInOrganization(orgaId);
         } catch (JsonProcessingException | JsonParseException | RestClientResponseException e) {
-            logger.debug("Error during IAM communication", e);
+            log.debug("Error during IAM communication", e);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to communicate with IAM backend.");
         }
     }

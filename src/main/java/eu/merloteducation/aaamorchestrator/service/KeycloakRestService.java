@@ -19,8 +19,7 @@ package eu.merloteducation.aaamorchestrator.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.merloteducation.aaamorchestrator.models.UserData;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.json.JsonParseException;
@@ -38,33 +37,34 @@ import java.net.URISyntaxException;
 import java.util.*;
 
 @Service
+@Slf4j
 public class KeycloakRestService {
+    private final RestTemplate restTemplate;
+    private final String keycloakTokenUri;
+    private final String keycloakAvailableRolesURI;
+    private final String keycloakLogout;
+    private final String clientId;
+    private final String grantType;
+    private final String keycloakUsermgmtUser;
+    private final String keycloakUsermgmtPass;
 
-    @Autowired
-    private RestTemplate restTemplate;
-
-    private final Logger logger = LoggerFactory.getLogger(KeycloakRestService.class);
-
-    @Value("${keycloak.token-uri}")
-    private String keycloakTokenUri;
-
-    @Value("${keycloak.available-roles-uri}")
-    private String keycloakAvailableRolesURI;
-
-    @Value("${keycloak.logout}")
-    private String keycloakLogout;
-
-    @Value("${keycloak.client-id}")
-    private String clientId;
-
-    @Value("${keycloak.authorization-grant-type}")
-    private String grantType;
-
-    @Value("${keycloak.usermgmt-user}")
-    private String keycloakUsermgmtUser;
-
-    @Value("${keycloak.usermgmt-pass}")
-    private String keycloakUsermgmtPass;
+    public KeycloakRestService(@Autowired RestTemplate restTemplate,
+                               @Value("${keycloak.token-uri}") String keycloakTokenUri,
+                               @Value("${keycloak.available-roles-uri}") String keycloakAvailableRolesURI,
+                               @Value("${keycloak.logout}") String keycloakLogout,
+                               @Value("${keycloak.client-id}") String clientId,
+                               @Value("${keycloak.authorization-grant-type}") String grantType,
+                               @Value("${keycloak.usermgmt-user}") String keycloakUsermgmtUser,
+                               @Value("${keycloak.usermgmt-pass}") String keycloakUsermgmtPass) {
+        this.restTemplate = restTemplate;
+        this.keycloakTokenUri = keycloakTokenUri;
+        this.keycloakAvailableRolesURI = keycloakAvailableRolesURI;
+        this.keycloakLogout = keycloakLogout;
+        this.clientId = clientId;
+        this.grantType = grantType;
+        this.keycloakUsermgmtUser = keycloakUsermgmtUser;
+        this.keycloakUsermgmtPass = keycloakUsermgmtPass;
+    }
 
     private Map<String, Object> loginUsermgmt() {
         MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
@@ -125,12 +125,12 @@ public class KeycloakRestService {
                 userData.addAll(ud);
             } catch (RestClientResponseException e) {
                 if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
-                    logger.info("No data at endpoint: {}", epStr);
+                    log.info("No data at endpoint: {}", epStr);
                 } else {
                     throw e;
                 }
             } catch (URISyntaxException e) {
-                logger.info("Failed to build URI. {}", e.getMessage());
+                log.info("Failed to build URI. {}", e.getMessage());
             }
         }
 
