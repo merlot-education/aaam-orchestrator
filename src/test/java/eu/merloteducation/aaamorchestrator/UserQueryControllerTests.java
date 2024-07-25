@@ -56,11 +56,8 @@ class UserQueryControllerTests {
     @MockBean
     private KeycloakRestService keycloakRestService;
 
-    @Autowired
-    private JwtAuthConverter jwtAuthConverter;
-
     @MockBean
-    private JwtAuthConverterProperties jwtAuthConverterProperties;
+    private JwtAuthConverter jwtAuthConverter;
 
     @BeforeEach
     void setUp() throws Exception {
