@@ -22,6 +22,7 @@ import eu.merloteducation.aaamorchestrator.security.WebSecurityConfig;
 import eu.merloteducation.aaamorchestrator.service.KeycloakRestService;
 import eu.merloteducation.authorizationlibrary.authorization.*;
 import eu.merloteducation.authorizationlibrary.config.InterceptorConfig;
+import eu.merloteducation.authorizationlibrary.config.MerlotSecurityConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +48,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest({UserQueryController.class, WebSecurityConfig.class})
-@Import({ AuthorityChecker.class, ActiveRoleHeaderHandlerInterceptor.class, JwtAuthConverter.class, InterceptorConfig.class})
+@Import({ AuthorityChecker.class, ActiveRoleHeaderHandlerInterceptor.class, JwtAuthConverter.class, InterceptorConfig.class, MerlotSecurityConfig.class})
 class UserQueryControllerTests {
 
     @Autowired
